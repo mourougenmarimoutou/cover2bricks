@@ -1,5 +1,4 @@
-# main.py
-# English comments: FastAPI app exposing endpoints for image->lego conversion and PDF generation.
+# FastAPI app for converting images to LEGO mosaics
 
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import Response, JSONResponse
@@ -13,10 +12,10 @@ from palette import get_rgb_palette, get_palette_metadata
 
 app = FastAPI(title="LEGO Vinyl Cover API")
 
-# Default bricks (we use 32 for the 25x25cm plate, as discussed)
+# Square plate size in bricks
 DEFAULT_BRICKS = 32
 
-# Autoriser votre frontend en dev (ou "*" pour tout autoriser)
+# CORS config for development
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -37,12 +36,7 @@ async def convert(
     cell_size: int = Form(16)  # pixels per brick for visualization
 ):
     """
-    Convert uploaded image to LEGO mosaic PNG and return JSON with matrix info.
-    Parameters:
-    - file: image file
-    - bricks: number of bricks per side (default 32)
-    - optional crop box: crop_left, crop_top, crop_right, crop_bottom (ints)
-    - cell_size: output scale for visualization PNG
+    Convert image to LEGO mosaic and return matrix info.
     """
     contents = await file.read()
     img = Image.open(io.BytesIO(contents)).convert("RGB")
@@ -95,7 +89,7 @@ async def convert_png(
     crop_bottom: Optional[int] = Form(None),
     cell_size: int = Form(16)
 ):
-    """Return the visualization PNG directly (binary)."""
+    """Return mosaic preview as PNG."""
     contents = await file.read()
     img = Image.open(io.BytesIO(contents)).convert("RGB")
 
@@ -126,12 +120,7 @@ async def convert_pdf(
     crop_bottom: Optional[int] = Form(None),
     cell_size_mm: float = Form(7.0)  # mm per brick on PDF plan (adjustable)
 ):
-    """
-    Generate a PDF with:
-    - visualization (small)
-    - a grid with color codes and counts
-    - list of required bricks (counts)
-    """
+    """Generate PDF build instructions."""
     contents = await file.read()
     img = Image.open(io.BytesIO(contents)).convert("RGB")
 
