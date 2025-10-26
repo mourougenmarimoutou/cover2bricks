@@ -1,4 +1,5 @@
 # FastAPI app for converting images to LEGO mosaics
+# 'python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000' to run
 
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import Response, JSONResponse

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // English comments: main app to upload, crop, and submit to FastAPI backend.
 // Now includes real-time preview using debounce.
+// 'npm run dev' to start the frontend server.
 
 import { ref } from 'vue'
 import Cropper from 'cropperjs'
