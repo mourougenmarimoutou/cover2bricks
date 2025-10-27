@@ -1,24 +1,35 @@
 # palette.py
-# English comments: simple local LEGO-like palette. Replace later with an official list or API.
-from typing import List, Tuple, Dict
+# English comments: Load LEGO color palette from colors.csv (value, children, rgb)
 
-# Each entry: (name, code, (r,g,b))
-LEGO_PALETTE: List[Dict] = [
-    {"name": "White", "code": "BLANC", "rgb": (242, 243, 242)},
-    {"name": "Black", "code": "NOIR", "rgb": (27, 42, 52)},
-    {"name": "Red",   "code": "RED",  "rgb": (196, 40, 27)},
-    {"name": "Blue",  "code": "BLUE", "rgb": (13, 105, 171)},
-    {"name": "Yellow","code": "YEL",  "rgb": (245, 205, 47)},
-    {"name": "Green", "code": "GRN",  "rgb": (40, 127, 70)},
-    {"name": "Dark Gray", "code": "DGR", "rgb": (99, 95, 98)},
-    {"name": "Light Gray","code": "LGR","rgb": (160, 160, 159)},
-    {"name": "Tan", "code": "TAN", "rgb": (215, 197, 153)},
-    {"name": "Brown","code": "BRN","rgb": (124, 92, 70)},
-    # add more as needed
-]
+import pandas as pd
+from pathlib import Path
 
-def get_rgb_palette() -> List[Tuple[int,int,int]]:
-    return [tuple(entry["rgb"]) for entry in LEGO_PALETTE]
+CSV_PATH = Path(__file__).parent / "colorspalette.csv"
+
+def load_palette():
+    """Load LEGO colors from CSV (columns: value, children, rgb)."""
+    df = pd.read_csv(CSV_PATH, sep=",") 
+    # Normalize column names (strip spaces, lowercase)
+    df.columns = [c.strip().lower() for c in df.columns]
+    # Convert hex string (#RRGGBB) to RGB tuple
+    df["rgb_tuple"] = df["rgb"].apply(
+        lambda h: tuple(int(h.lstrip("#")[i:i+2], 16) for i in (0, 2, 4))
+    )
+    return df
+
+def get_rgb_palette():
+    """Return list of RGB tuples [(r,g,b), ...] for all colors."""
+    df = load_palette()
+    return df["rgb_tuple"].tolist()
 
 def get_palette_metadata():
-    return LEGO_PALETTE
+    """Return list of dicts with color metadata (value, name, rgb)."""
+    df = load_palette()
+    return [
+        {
+            "code": int(row["value"]),
+            "name": row["children"],
+            "rgb": row["rgb_tuple"]
+        }
+        for _, row in df.iterrows()
+    ]

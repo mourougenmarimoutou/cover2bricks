@@ -13,8 +13,8 @@ let cropper: Cropper | null = null
 
 const backendUrl = 'http://127.0.0.1:8000'
 
-const bricks = ref(32)
-const cellSize = ref(12)
+const bricksPerSide = ref(32)
+const cellSize = ref(24)
 
 const resultPngUrl = ref<string | null>(null)
 const pdfBlobUrl = ref<string | null>(null)
@@ -34,7 +34,7 @@ const updatePreview = debounce(async () => {
 
   const form = new FormData()
   form.append('file', blob, 'cropped.png')
-  form.append('bricks', String(bricks.value))
+  form.append('bricks', String(bricksPerSide.value))
   form.append('cell_size', String(cellSize.value))
 
   loading.value = true
@@ -95,7 +95,7 @@ async function submitForPng() {
 
   const form = new FormData()
   form.append('file', blob, 'cropped.png')
-  form.append('bricks', String(bricks.value))
+  form.append('bricks', String(bricksPerSide.value))
   form.append('cell_size', String(cellSize.value))
 
   const resp = await fetch(`${backendUrl}/convert/png`, { method: 'POST', body: form })
@@ -123,7 +123,7 @@ async function requestPdf() {
 
   const form = new FormData()
   form.append('file', blob, 'cropped.png')
-  form.append('bricks', String(bricks.value))
+  form.append('bricks', String(bricksPerSide.value))
   form.append('cell_size_mm', String(7.0))
 
   const resp = await fetch(`${backendUrl}/convert/pdf`, { method: 'POST', body: form })
@@ -134,6 +134,43 @@ async function requestPdf() {
   const blobResp = await resp.blob()
   if (pdfBlobUrl.value) URL.revokeObjectURL(pdfBlobUrl.value)
   pdfBlobUrl.value = URL.createObjectURL(blobResp)
+}
+
+/**
+ * Generate a PDF instruction plan with CSV from the cropped image.
+ */
+async function requestPdfWithCsv() {
+  if (!cropper) {
+    alert('Please upload and crop an image first.')
+    return
+  }
+  const canvas = cropper.getCroppedCanvas()
+  if (!canvas) return
+  const blob = await new Promise<Blob | null>(res => canvas.toBlob(b => res(b), 'image/png'))
+  if (!blob) return
+
+  const form = new FormData()
+  form.append('file', blob, 'cropped.png')
+  form.append('bricks', String(bricksPerSide.value))
+  form.append('cell_size_mm', String(7.0))
+  form.append('include_csv', 'true')
+
+  const resp = await fetch(`${backendUrl}/convert/pdf`, { method: 'POST', body: form })
+  if (!resp.ok) {
+    alert('Error from backend: ' + resp.statusText)
+    return
+  }
+  const blobResp = await resp.blob()
+  const downloadUrl = URL.createObjectURL(blobResp)
+  
+  // Créer un lien temporaire pour déclencher le téléchargement
+  const a = document.createElement('a')
+  a.href = downloadUrl
+  a.download = 'lego_plan_with_parts.zip'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(downloadUrl)
 }
 </script>
 
@@ -148,7 +185,10 @@ async function requestPdf() {
       </label>
       <div class="input-group">
         <label>Bricks per side:
-          <input type="number" v-model.number="bricks" min="8" max="128" />
+          <select v-model="bricksPerSide">
+            <option value="32">32 x 32 (1 base plate)</option>
+            <option value="64">64 x 64 (4 base plates)</option>
+          </select>
         </label>
         <label>Cell size (preview px):
           <input type="number" v-model.number="cellSize" min="4" max="64" />
@@ -189,9 +229,18 @@ async function requestPdf() {
     <section v-if="pdfBlobUrl && !loading" class="pdf-section">
       <h3>PDF Plan</h3>
       <div class="pdf-actions">
-        <a :href="pdfBlobUrl" download="lego_plan.pdf" class="download-btn">
+        <a :href="pdfBlobUrl" 
+           download="lego_plan.pdf" 
+           class="download-btn"
+           :class="{ 'disabled': loading }">
           Download PDF
         </a>
+        <button 
+          @click="requestPdfWithCsv" 
+          class="download-btn"
+          :class="{ 'disabled': loading }">
+          Download PDF + parts CSV
+        </button>
       </div>
       <div class="pdf-preview">
         <embed
@@ -264,6 +313,10 @@ async function requestPdf() {
 .pdf-actions {
   margin-bottom: 16px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
 }
 
 .pdf-preview {
@@ -284,11 +337,32 @@ button {
   color: white;
   text-decoration: none;
   border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background: #45a049;
 }
 
 .download-link {
   margin-top: 8px;
   text-align: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin: 0;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
