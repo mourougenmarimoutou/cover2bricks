@@ -1,1 +1,50 @@
 # Cover2Bricks
+
+A web application that converts vinyl cover images into LEGO mosaic building instructions.
+
+## Features
+
+- Upload and crop vinyl cover images
+- Convert images to LEGO-compatible colors
+- Generate building instructions in PDF format
+- Export brick parts list in CSV format
+- Support for 32x32 (~25x25 cm) and 64x64 (~50x50 cm) builds
+- Real-time preview of the mosaic
+
+## Technical Requirements
+
+### Backend
+- Python 3.8+
+- FastAPI
+- Pillow
+- ReportLab
+- uvicorn
+
+### Frontend
+- Node.js 16+
+- Vue 3
+- TypeScript
+- Cropper.js
+
+## Quick Start
+
+1. Start the backend:
+```bash
+cd backend
+pip install -r requirements.txt
+python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
+```
+
+2. Start the frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+3. Open http://localhost:5173 in your browser
+
+## Output Files
+
+- **PDF**: Building instructions with color grid and parts list
+- **CSV**: Parts list compatible with BrickLink/LEGO ordering systems
