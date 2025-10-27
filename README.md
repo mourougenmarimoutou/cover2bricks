@@ -48,3 +48,5 @@ npm run dev
 
 - **PDF**: Building instructions with color grid and parts list
 - **CSV**: Parts list compatible with BrickLink/LEGO ordering systems
+
+The PDF file can be downloaded on its own or in a zip file with the parts list file.
