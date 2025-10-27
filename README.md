@@ -53,3 +53,9 @@ You **need** to press `Generate PDF plan` in order to get the building instructi
 - **CSV**: Parts list compatible with BrickLink/LEGO ordering systems
 
 The PDF file can be downloaded on its own or in a zip file with the parts list file.
+
+
+
+## TODO
+
+[ ] Automatic addition of 1x2 bricks to connect the 32x32 plates together
