@@ -8,7 +8,7 @@ A web application that converts vinyl cover images or regular images into LEGO m
 - Convert images to LEGO-compatible colors
 - Generate building instructions in PDF format
 - Export brick parts list in CSV format
-- Support for 32x32 (~25x25 cm) and 64x64 (~50x50 cm) builds
+- Support for 32x32 bricks (~25x25 cm) and 64x64 bricks (~50x50 cm) builds
 - Real-time preview of the mosaic
 
 ## Technical Requirements
