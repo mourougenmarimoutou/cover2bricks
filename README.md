@@ -1,10 +1,10 @@
 # Cover2Bricks
 
-A web application that converts vinyl cover images into LEGO mosaic building instructions.
+A web application that converts vinyl cover images or regular images into LEGO mosaic building instructions.
 
 ## Features
 
-- Upload and crop vinyl cover images
+- Upload and crop images
 - Convert images to LEGO-compatible colors
 - Generate building instructions in PDF format
 - Export brick parts list in CSV format
