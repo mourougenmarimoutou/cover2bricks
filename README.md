@@ -44,6 +44,9 @@ npm run dev
 
 3. Open http://localhost:5173 in your browser
 
+There is live preview but you can use the `Generate PNG preview` button if needed.  
+You **need** to press `Generate PDF plan` in order to get the building instructions and the parts list csv generated.
+
 ## Output Files
 
 - **PDF**: Building instructions with color grid and parts list
